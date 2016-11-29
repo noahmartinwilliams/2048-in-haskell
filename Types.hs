@@ -28,6 +28,14 @@ changeElement (x, 0) new (list : rest) = (intern x new list) : rest where
 	intern x new (head : rest) = head : (intern (x - 1) new rest)
 changeElement (x, y) new (list : rest) = list : (changeElement (x, (y - 1)) new rest)
 
+subTree :: [[Int]] -> Tree
+subTree b = Tree b (fillRandom (swipeUp b)) (fillRandom (swipeDown b)) (fillRandom (swipeLeft b)) (fillRandom (swipeRight b))
+
+fillRandom :: [[Int]] -> [Tree]
+fillRandom b = (intern b (getEmpty b)) where
+	intern _ [] = []
+	intern b (first : rest) = (subTree (changeElement first 2 b)) : (subTree (changeElement first 4 b)) : (intern b rest)
+
 swipeRight :: [[Int]] -> [[Int]]
 swipeRight [] = []
 swipeRight (first : rest) =  (intern first 0) : (swipeRight rest) where
