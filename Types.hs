@@ -11,6 +11,16 @@ append :: [a] -> [a] -> [a]
 append [] list = list
 append (first : rest) list = first : (append rest list)
 
+getEmpty :: [[Int]] -> [(Int, Int)]
+getEmpty list = (intern list 0) where
+	intern :: [[Int]] -> Int -> [(Int, Int)]
+	intern [] _ = []
+	intern (first : rest) y = append (intern2 first y 0)  (intern rest (y + 1)) where
+		intern2 :: [Int] -> Int -> Int -> [(Int, Int)]
+		intern2 [] _ _ = []
+		intern2 (0 : rest) y x = (x, y) : (intern2 rest y (x + 1))
+		intern2 (_ : rest) y x = (intern2 rest y (x + 1))
+
 swipeRight :: [[Int]] -> [[Int]]
 swipeRight [] = []
 swipeRight (first : rest) =  (intern first 0) : (swipeRight rest) where
