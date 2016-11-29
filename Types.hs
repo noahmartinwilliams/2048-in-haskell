@@ -36,3 +36,7 @@ swipeRight (first : rest) =  (intern first 0) : (swipeRight rest) where
 	intern [] x = 0 : (intern [] (x - 1))
 	intern (0 : rest) end = intern rest (end + 1)
 	intern (first : second : rest ) end = if first == second then (first + second) : (intern rest (end + 1)) else (first : second : (intern rest end))
+	intern (first : rest) end = first : (intern rest end)
+
+swipeUp :: [[Int]] -> [[Int]]
+swipeUp b =  rotateBoard (rotateBoard (rotateBoard (swipeRight (rotateBoard b))))
