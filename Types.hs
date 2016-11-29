@@ -40,3 +40,9 @@ swipeRight (first : rest) =  (intern first 0) : (swipeRight rest) where
 
 swipeUp :: [[Int]] -> [[Int]]
 swipeUp b =  rotateBoard (rotateBoard (rotateBoard (swipeRight (rotateBoard b))))
+
+swipeLeft :: [[Int]] -> [[Int]]
+swipeLeft b = rotateBoard (rotateBoard (swipeRight (rotateBoard (rotateBoard b))))
+
+swipeDown :: [[Int]] -> [[Int]]
+swipeDown b = rotateBoard (swipeRight (rotateBoard (rotateBoard (rotateBoard b))))
