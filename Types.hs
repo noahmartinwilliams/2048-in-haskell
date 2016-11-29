@@ -21,6 +21,13 @@ getEmpty list = (intern list 0) where
 		intern2 (0 : rest) y x = (x, y) : (intern2 rest y (x + 1))
 		intern2 (_ : rest) y x = (intern2 rest y (x + 1))
 
+changeElement :: (Int, Int) -> Int -> [[Int]] -> [[Int]]
+changeElement (x, 0) new (list : rest) = (intern x new list) : rest where
+	intern :: Int -> Int -> [Int] -> [Int]
+	intern 0 new (_ : rest) = new : rest
+	intern x new (head : rest) = head : (intern (x - 1) new rest)
+changeElement (x, y) new (list : rest) = list : (changeElement (x, (y - 1)) new rest)
+
 swipeRight :: [[Int]] -> [[Int]]
 swipeRight [] = []
 swipeRight (first : rest) =  (intern first 0) : (swipeRight rest) where
