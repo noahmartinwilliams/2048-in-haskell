@@ -1,4 +1,4 @@
-module Types where
+module Main where
 
 -- Tree board up down left right
 data Tree = Tree [[Int]] [Tree] [Tree] [Tree] [Tree]
