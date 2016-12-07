@@ -1,13 +1,20 @@
 module Main where
 
 import System.Random
+import Control.Monad
 -- Tree board up down left right
 data Tree = Tree [[Int]] [Tree] [Tree] [Tree] [Tree]
+	deriving (Show, Eq)
+
+data Dir = Up | Down | Left | Right
 	deriving (Show, Eq)
 
 -- Rotates counter clockwise
 rotateBoard :: [[Int]] -> [[Int]]
 rotateBoard [[a, b, c, d], [e, f, g, h], [i, j, k, l], [m, n, o, p]] = [[d, h, l, p], [c, g, k, o], [b, f, j, n], [a, e, i, m]]
+
+gameOver :: [[Int]] -> Bool
+gameOver b = if (swipeUp b) == (swipeDown b) && (swipeDown b) == (swipeLeft b) && (swipeLeft b) == (swipeRight b) then True else False
 
 append :: [a] -> [a] -> [a]
 append [] list = list
@@ -31,8 +38,32 @@ changeElement (x, 0) new (list : rest) = (intern x new list) : rest where
 changeElement (x, y) new (list : rest) = list : (changeElement (x, (y - 1)) new rest)
 
 subTree :: [[Int]] -> Tree
-subTree b = Tree b (fillRandom (swipeUp b)) (fillRandom (swipeDown b)) (fillRandom (swipeLeft b)) (fillRandom (swipeRight b))
+subTree b = Tree b (swipeDir Up b) (swipeDir Down b) (swipeDir Main.Left b) (swipeDir Main.Right b)
 
+swipeDir :: Dir -> [[Int]] -> [Tree]
+swipeDir Up b = if (swipeUp b) /= b
+	then
+		fillRandom (swipeUp b)
+	else
+		[]
+
+swipeDir Down b = if (swipeDown b) /= b
+	then
+		fillRandom (swipeDown b)
+	else
+		[]
+
+swipeDir Main.Left b = if (swipeLeft b) /= b
+	then
+		fillRandom (swipeLeft b)
+	else
+		[]
+
+swipeDir Main.Right b = if (swipeRight b) /= b
+	then
+		fillRandom (swipeRight b)
+	else
+		[]
 fillRandom :: [[Int]] -> [Tree]
 fillRandom b = (intern b (getEmpty b)) where
 	intern _ [] = []
@@ -106,37 +137,57 @@ goIntern t (random : rest) = go (t !! (mod (abs random) (length t))) rest
 go :: Tree -> [Int] -> IO Int
 go (Tree board up down left right) random= do
 	printBoard board
-	putStrLn "move? [wasd, r = redo, l = leave]"
-	move <- getLine
-	e <- (if move == "w"
-	then
-		goIntern up random
-	else if move == "s" 
-	then
-		goIntern down random
-	else if move == "a"
-	then
-		goIntern left random
-	else if move == "d"
-	then
-		goIntern right random
-	else if move == "r"
-	then
-		return 1
-	else if move == "l"
+	if gameOver board
 	then
 		return 3
-	else
-		invalidMove (Tree board up down left right) random)
+	else do
+		putStrLn "move? [wasd, r = redo, l = leave]"
+		move <- getLine
+		e <- (if move == "w"
+		then
+			if up == []
+			then
+				go (Tree board up down left right) random
+			else
+				goIntern up random
+		else if move == "s" 
+		then
+			if down == []
+			then
+				go (Tree board up down left right) random
+			else
+				goIntern down random
+		else if move == "a"
+		then
+			if left == []
+			then
+				go (Tree board up down left right) random
+			else
+				goIntern left random
+		else if move == "d"
+		then
+			if right == []
+			then
+				go (Tree board up down left right) random
+			else
+				goIntern right random
+		else if move == "r"
+		then
+			return 1
+		else if move == "l"
+		then
+			return 3
+		else
+			invalidMove (Tree board up down left right) random)
 
-	if e == 1
-	then
-		return 2
-	else if e == 2
-	then
-		go (Tree board up down left right) random
-	else 
-		return 0
+		if e == 1
+		then
+			return 2
+		else if e == 2
+		then
+			go (Tree board up down left right) random
+		else 
+			return 0
 
 goWrapper :: [Tree] -> [Int] -> IO Int
 goWrapper t (random : rest) = do
