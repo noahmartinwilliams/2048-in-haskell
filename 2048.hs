@@ -6,43 +6,34 @@ import Swipe
 import Types
 import Matrix
 import Interface
+import Colors
 import System.Console.GetOpt
 import System.Environment(getArgs, getProgName)
+import Data.Foldable
 
-data Options = Options {
-	optVersion :: Bool,
-	optColor :: String
-	}
-	deriving (Show, Eq)
-
-displayVersion :: IO Int
-displayVersion = do
-	putStrLn "2048 v1.1.0 by Noah Williams"
+printVersionNumber :: IO Int
+printVersionNumber = do
+	putStrLn "2048 by Noah Williams version 1.2"
 	return 1
 
-defaultOptions = Options {
-	optVersion = True,
-	optColor = ""
-	}
-options :: [OptDescr(Options -> Options)]
-options = [
-	Option ['v'] ["version"] (NoArg (\opts -> opts {optVersion = True}) ) "display version and exit",
-	Option ['c'] ["color"] (ReqArg (\g opts -> opts {optColor = (read g)}) "COLOR") "2 : txtylw"
-	]
+data Opt = Version | ColorStr String
+	deriving (Show, Eq)
 
-parseArgs :: IO Options
-parseArgs = do
-	argv <- getArgs
-	case getOpt RequireOrder options argv of
-		(opts, [], []) -> return (foldl (flip id) defaultOptions opts)
+getColorOpt :: [Opt] -> [(String, Color)]
+getColorOpt [] = []
+getColorOpt ((ColorStr s) : _) = processColorOpts s
+getColorOpt (_ : rest) = getColorOpt rest
 
 main :: IO Int
 main = do
-	options <- parseArgs
-	let (Options {optVersion = showVersion, optColor = colors}) = options
-	if showVersion 
+	args <- getArgs
+	let (options, _, _) = getOpt RequireOrder [
+		(Option ['v'] ["version"] (NoArg Version) "Print version and exit"),
+		(Option ['c'] ["color"] (ReqArg (\a -> ColorStr a) "") "set the colors to use")] args
+	if (options !! 0 ) == Version
 	then
-		displayVersion
+		printVersionNumber
 	else do
+		let c = getColorOpt options
 		g <- getStdGen
-		goWrapper (fillRandom [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]) (randoms g :: [Int])
+		goWrapper (fillRandom [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]) (randoms g :: [Int]) c
