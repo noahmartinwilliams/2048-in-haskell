@@ -1,0 +1,10 @@
+* features:
+	* colors
+		-c "(2|4|8|16|32|64|128|256|512|1024|2048):(txt|bld|und)(blk|red|grn|ylw|blu|pur|cyn|wht)"
+		-c <uses default colors>
+	* ncurses
+	* clear screen
+	* play random game
+	* spit out random seed
+	* take in random seed
+
