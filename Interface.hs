@@ -3,6 +3,7 @@ module Interface where
 import Types
 import Swipe
 import Colors
+import System.Random
 
 
 gameOver :: [[Int]] -> Bool
@@ -40,6 +41,16 @@ printRow (first : rest) c = (printRowIntern first c) ++ (printRow rest c)
 printBoard :: [[Int]] -> [(String, Color)] -> String
 printBoard [a, b, c, d] colors = "[" ++(printRow a colors) ++ "----------------------\n" ++"[" ++ (printRow b colors) ++ "----------------------\n" ++ "[" ++ (printRow c colors) ++ "----------------------\n" ++ "[" ++ (printRow d colors) ++"----------------------\n" 
 
+gameOverPrompt :: [(String, Color)] -> IO Int
+gameOverPrompt colors = do
+	putStrLn "Game over. [r = redo, p = play again]"
+	input <- getLine
+	g <- getStdGen
+	case input of 
+		"r" -> return 1
+		"p" -> goWrapper (fillRandom [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]) (randoms g :: [Int]) colors
+		_ -> gameOverPrompt colors
+
 goIntern :: [Tree] -> [Int] -> [(String, Color)] -> IO Int
 goIntern t (random : rest) colors = go (t !! (mod (abs random) (length t))) rest colors
 
@@ -48,7 +59,7 @@ go (Tree board up down left right) random colors= do
 	putStr (printBoard board colors)
 	if gameOver board
 	then
-		return 3
+		gameOverPrompt colors
 	else do
 		putStrLn "move? [wasd, r = redo, l = leave]"
 		move <- getLine

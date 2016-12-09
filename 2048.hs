@@ -13,7 +13,7 @@ import Data.Foldable
 
 printVersionNumber :: IO Int
 printVersionNumber = do
-	putStrLn "2048 by Noah Williams version 1.2"
+	putStrLn "2048 by Noah Williams version 1.3"
 	return 1
 
 data Opt = Version | ColorStr String
@@ -30,7 +30,7 @@ main = do
 	let (options, _, _) = getOpt RequireOrder [
 		(Option ['v'] ["version"] (NoArg Version) "Print version and exit"),
 		(Option ['c'] ["color"] (ReqArg (\a -> ColorStr a) "") "set the colors to use")] args
-	if (options !! 0 ) == Version
+	if (length options) /= 0 && (options !! 0 ) == Version
 	then
 		printVersionNumber
 	else do
